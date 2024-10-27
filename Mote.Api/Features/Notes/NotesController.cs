@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Mote.Api.Data;
+using Mote.Api.Features.Notes.Types;
 using Mote.Api.Models;
 
 namespace Mote.Api.Features.Notes;
@@ -27,6 +28,7 @@ public class NotesController : Controller
         // var userIdResponse = _userResolverService.GetUserId();
         // if (userIdResponse is null)
         // {
+        
         //     return BadRequest("No user found");
         // }
         
@@ -38,5 +40,58 @@ public class NotesController : Controller
         }
         
         return Ok(notesResult.Value);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateNoteRequest noteDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
+        // var userIdResponse = _userResolverService.GetUserId();
+        // if (userIdResponse is null)
+        // {
+        //     return BadRequest("No user found");
+        // }
+        
+        // var userId = new Guid(userIdResponse);
+        var userId = Guid.Empty;
+        var noteResult = await _notesService.SaveNoteAsync(noteDto);
+        if (noteResult.IsFailed)
+        {
+            return BadRequest(noteResult.Errors.First());
+        }
+        
+        return Ok(noteResult.Value);
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] UpdateNoteRequest noteDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
+        
+        var noteResult = await _notesService.UpdateNoteAsync(noteDto);
+        if (noteResult.IsFailed)
+        {
+            return BadRequest(noteResult.Errors.First());
+        }
+        
+        return Ok(noteResult.Value);
+    }
+    
+    [HttpDelete("{noteId}")]
+    public async Task<IActionResult> Delete(Guid noteId)
+    {
+        var deleteResult = await _notesService.DeleteNoteAsync(noteId);
+        if (deleteResult.IsFailed)
+        {
+            return BadRequest(deleteResult.Errors.First());
+        }
+        
+        return Ok();
     }
 }
