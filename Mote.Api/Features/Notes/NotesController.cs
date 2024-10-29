@@ -23,7 +23,7 @@ public class NotesController : Controller
     
     // GET
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> GetAllNotes()
     {
         // var userIdResponse = _userResolverService.GetUserId();
         // if (userIdResponse is null)
@@ -42,8 +42,22 @@ public class NotesController : Controller
         return Ok(notesResult.Value);
     }
     
+    [HttpGet("{noteId}")]
+    [ProducesResponseType<Note>(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetNoteById([FromRoute] Guid noteId)
+    {
+        var noteResult = await _notesService.GetNoteByIdAsync(noteId);
+        if (noteResult.IsFailed)
+        {
+            return NotFound();
+        }
+        
+        return Ok(noteResult.Value);
+    }
+    
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateNoteRequest noteDto)
+    public async Task<IActionResult> CreateNote([FromBody] CreateNoteRequest noteDto)
     {
         if (!ModelState.IsValid)
         {
@@ -67,7 +81,7 @@ public class NotesController : Controller
     }
     
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateNoteRequest noteDto)
+    public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteRequest noteDto)
     {
         if (!ModelState.IsValid)
         {
@@ -84,7 +98,7 @@ public class NotesController : Controller
     }
     
     [HttpDelete("{noteId}")]
-    public async Task<IActionResult> Delete(Guid noteId)
+    public async Task<IActionResult> DeleteNote(Guid noteId)
     {
         var deleteResult = await _notesService.DeleteNoteAsync(noteId);
         if (deleteResult.IsFailed)

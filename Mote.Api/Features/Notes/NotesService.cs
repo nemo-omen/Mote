@@ -11,6 +11,7 @@ public interface INotesService
 {
     Task<Result<List<Note>>> GetAllNotesAsync();
     Task<Result<List<Note>>> GetNotesByUserAsync(Guid userId);
+    Task<Result<Note>> GetNoteByIdAsync(Guid noteId);
     Task<Result<Note>> SaveNoteAsync(CreateNoteRequest noteDto);
     Task<Result<List<Note>>> GetChildren(Guid noteId);
     Task<Result<Note>> UpdateNoteAsync(UpdateNoteRequest noteDto);
@@ -44,6 +45,23 @@ public class NotesService : INotesService
     {
         var notes = await _context.Notes.Where(n => n.CreatedBy == userId).ToListAsync();
         return Result.Ok(notes);
+    }
+
+    public async Task<Result<Note>> GetNoteByIdAsync(Guid noteId)
+    {
+        var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == noteId);
+        if (note is null)
+        {
+            return Result.Fail<Note>($"Note with id {noteId} not found");
+        }
+
+        var childrenResult = await GetChildren(noteId);
+        if (!childrenResult.IsFailed)
+        {
+            note.Children = childrenResult.Value;
+        }
+
+        return Result.Ok(note);
     }
     
     public async Task<Result<Note>> SaveNoteAsync(CreateNoteRequest noteDto)
