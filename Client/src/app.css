@@ -71,13 +71,16 @@
   }
   body {
     @apply bg-background text-foreground;
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 20rem 1fr;
-    grid-template-areas: "header header"
-                         "sidebar main"
-                         "footer footer";
   }
+}
+
+body {
+  /*min-height: 100vh;*/
+  /*display: grid;*/
+  /*grid-template-rows: auto 1fr auto;*/
+  /*grid-template-columns: 20rem 1fr;*/
+  /*grid-template-areas: "header header"*/
+  /*                       "sidebar main"*/
+  /*                       "footer footer";*/
 }
 

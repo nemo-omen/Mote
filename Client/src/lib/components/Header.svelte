@@ -3,14 +3,12 @@
     import Sun from 'lucide-svelte/icons/sun';
     import Moon from 'lucide-svelte/icons/moon';
     import { Button } from '$lib/components/ui/button/index';
+    
+    let { children } = $props();
 </script>
 
 <header class="flex flex-row justify-between items-center p-2 border-b-2 border-muted">
-    <h1>
-        <a href="/" class="font-bold">
-            Mote
-        </a>
-    </h1>
+    {@render children()}
     <nav>
         <ul class="flex flex-row gap-4 items-center">
             <li><a href="/">Home</a></li>
@@ -32,5 +30,6 @@
 <style>
     header {
         grid-area: header;
+        width: 100%;
     }
 </style>
