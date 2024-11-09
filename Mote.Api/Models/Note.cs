@@ -1,13 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using Slugify;
 
 namespace Mote.Api.Models;
 
 public class Note : MetadataModel
 {
     [MaxLength(255)]
-    public string Title { get; set; } = "untitled";
+    public string Title { get; set; }
+    public string Slug { get; set; }
+
+    public string Path { get; set; }
+    
     public string? Content { get; set; }
     public bool IsArchived { get; set; }
     public bool IsTask { get; set; }

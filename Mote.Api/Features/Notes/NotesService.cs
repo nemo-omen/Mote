@@ -12,6 +12,8 @@ public interface INotesService
     Task<Result<List<Note>>> GetAllNotesAsync();
     Task<Result<List<Note>>> GetNotesByUserAsync(Guid userId);
     Task<Result<Note>> GetNoteByIdAsync(Guid noteId);
+    Task<Result<Note>> GetNoteByPathAsync(string path);
+    
     Task<Result<Note>> SaveNoteAsync(CreateNoteRequest noteDto);
     Task<Result<List<Note>>> GetChildren(Guid noteId);
     Task<Result<Note>> UpdateNoteAsync(UpdateNoteRequest noteDto);
@@ -35,7 +37,15 @@ public class NotesService : INotesService
             var childrenResult = await GetChildren(note.Id);
             if(!childrenResult.IsFailed)
             {
-                note.Children = childrenResult.Value;
+                var children = new List<Note>();
+                foreach (var child in childrenResult.Value)
+                {
+                    if (child is not null)
+                    {
+                        children.Add(child);
+                    }
+                }
+                note.Children = children;
             }
         }
         return Result.Ok(notes);
@@ -56,6 +66,23 @@ public class NotesService : INotesService
         }
 
         var childrenResult = await GetChildren(noteId);
+        if (!childrenResult.IsFailed)
+        {
+            note.Children = childrenResult.Value;
+        }
+
+        return Result.Ok(note);
+    }
+    
+    public async Task<Result<Note>> GetNoteByPathAsync(string path)
+    {
+        var note = await _context.Notes.FirstOrDefaultAsync(n => n.Path == path);
+        if (note is null)
+        {
+            return Result.Fail<Note>($"Note with path {path} not found");
+        }
+
+        var childrenResult = await GetChildren(note.Id);
         if (!childrenResult.IsFailed)
         {
             note.Children = childrenResult.Value;

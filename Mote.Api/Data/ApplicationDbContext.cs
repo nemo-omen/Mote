@@ -1,5 +1,6 @@
 using Mote.Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Slugify;
 
 namespace Mote.Api.Data;
 using Microsoft.EntityFrameworkCore;
@@ -30,5 +31,40 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(n => n.Children)
             .HasForeignKey(n => n.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public override int SaveChanges()
+    {
+        UpdatePathsAndSlugs();
+        return base.SaveChanges();
+    }
+    
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        UpdatePathsAndSlugs();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdatePathsAndSlugs()
+    {
+        foreach (var entry in ChangeTracker.Entries<Note>())
+        {
+            if(entry.State == EntityState.Added || entry.State == EntityState.Modified)
+            {
+                entry.Entity.Slug = GetSlug(entry.Entity.Title);
+                entry.Entity.Path = GetPath(entry.Entity.Parent, entry.Entity.Slug);
+            }
+        }
+    }
+    
+    private string GetPath(Note? parent, string slug)
+    {
+        return !string.IsNullOrWhiteSpace(parent?.Path) ? parent.Path + "/" + slug : slug;
+    }
+    
+    private string GetSlug(string title)
+    {
+        var slugHelper = new SlugHelper();
+        return slugHelper.GenerateSlug(title);
     }
 }

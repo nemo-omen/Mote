@@ -23,6 +23,8 @@ public class NotesController : Controller
     
     // GET
     [HttpGet]
+    [ProducesResponseType<List<Note>>(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> GetAllNotes()
     {
         // var userIdResponse = _userResolverService.GetUserId();
@@ -48,6 +50,20 @@ public class NotesController : Controller
     public async Task<IActionResult> GetNoteById([FromRoute] Guid noteId)
     {
         var noteResult = await _notesService.GetNoteByIdAsync(noteId);
+        if (noteResult.IsFailed)
+        {
+            return NotFound();
+        }
+        
+        return Ok(noteResult.Value);
+    }
+    
+    [HttpGet("path")]
+    [ProducesResponseType<Note>(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetNoteByPath(string path)
+    {
+        var noteResult = await _notesService.GetNoteByPathAsync(path);
         if (noteResult.IsFailed)
         {
             return NotFound();

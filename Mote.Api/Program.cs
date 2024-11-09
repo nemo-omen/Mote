@@ -68,9 +68,12 @@ const string onlyAllowLocalhostOrigins = "_onlyAllowLocalhostOrigins";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: onlyAllowLocalhostOrigins, policy =>
+    options.AddPolicy(name: onlyAllowLocalhostOrigins,
+        policy =>
         {
-            policy.WithOrigins("http://localhost");
+            policy.WithOrigins(["http://localhost", "http://localhost:3000", "http://localhost:5173"])
+                .AllowAnyHeader()
+                .AllowAnyMethod();
         });
 });
 
@@ -100,14 +103,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseHttpsRedirection();
+app.UseCors(onlyAllowLocalhostOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 app.CustomMapIdentityApi<ApplicationUser>()
     .RequireCors(onlyAllowLocalhostOrigins);
 app.MapControllers();
 
-app.UseHttpsRedirection();
 
 app.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager,
         [FromBody] object empty) =>

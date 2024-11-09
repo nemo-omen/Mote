@@ -21,6 +21,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Identity.Client" Version="4.66.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+        <PackageReference Include="Slugify.Core" Version="4.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
