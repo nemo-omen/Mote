@@ -10,6 +10,11 @@
     import {onMount} from "svelte";
     import {javascript} from "@codemirror/lang-javascript";
     import {keymap} from "@codemirror/view";
+    import {defaultHighlightStyle, LanguageDescription, syntaxHighlighting} from "@codemirror/language";
+    import {css} from "@codemirror/lang-css";
+    import {html} from "@codemirror/lang-html";
+    import {go} from "@codemirror/lang-go";
+    import {json} from "@codemirror/lang-json";
 
     let { data } = $props();
     
@@ -35,7 +40,17 @@
             extensions: [
                 basicSetup,
                 keymap.of([indentWithTab]),
-                markdown({base: markdownLanguage}),
+                markdown({
+                    base: markdownLanguage,
+                    codeLanguages: [
+                        LanguageDescription.of({ name: "javascript", alias: ["js"], support: javascript() }),
+                        LanguageDescription.of({ name: "json", alias: ["json"], support: json() }),
+                        LanguageDescription.of({ name: "css", alias: ["css"], support: css() }),
+                        LanguageDescription.of({ name: "html", alias: ["html"], support: html() }),
+                        LanguageDescription.of({ name: "go", alias: ["go"], support: go() }),
+                    ]
+                }),
+                syntaxHighlighting(defaultHighlightStyle),
                 barf,
                 EditorView.updateListener.of((update) => {
                     if (update.docChanged) {
@@ -103,10 +118,5 @@
     
     :global(.cm-content) {
         font-size: 1.2rem;
-        /*color: var(--slate-500);*/
-    }
-
-    :global(.cm-focused .cm-content) {
-        /*color: var(--slate-200);*/
     }
 </style>
